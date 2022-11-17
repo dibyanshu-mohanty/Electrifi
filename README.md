@@ -3,6 +3,8 @@
 For the world of multi-tasking people,  there is always a scope for better  innovation and bringing in technology  that makes life easier.
 Presenting **Thingify** - a 3 in 1  multifunctionality IoT solution which can  leverage your problems over the *Fire Alarm*, *Weather Tracking* and *Smart Automation*. By using our product, the user can take  constantly monitor as well as take  control of their workplaces. Let it be  tracking your loved ones' health  remotely or Tracking the weather  conditions of your warehouse or be it  controlling the devices at your home  remotely. We got it all covered.
 
+![Thingify](https://user-images.githubusercontent.com/72657275/202455567-8ec1aeac-9ee2-4f38-ad58-2adf94d277a9.png)
+
 
 ## Tech Stack
 
@@ -14,5 +16,6 @@ Presenting **Thingify** - a 3 in 1  multifunctionality IoT solution which can  l
 
 ## Circuit Diagram
 
-![Circuit Diagram](https://user-images.githubusercontent.com/72657275/202454233-7fc43172-d797-4a59-96df-557e3b9bc852.png)
+[<img src="https://user-images.githubusercontent.com/72657275/202454233-7fc43172-d797-4a59-96df-557e3b9bc852.png" width="400" />](https://user-images.githubusercontent.com/72657275/202454233-7fc43172-d797-4a59-96df-557e3b9bc852.png)
+
 
