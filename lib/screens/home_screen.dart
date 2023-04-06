@@ -3,11 +3,12 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:iot_project/provider/qr_scanner_provider.dart';
+import 'package:iot_project/provider/smart_meter_provider.dart';
 import 'package:iot_project/screens/automation_detail_screen.dart';
-import 'package:iot_project/screens/fire_detail_screen.dart';
-import 'package:iot_project/screens/notification_screen.dart';
+import 'package:iot_project/screens/smart_meter_screen.dart';
 import 'package:iot_project/screens/weather_details_screen.dart';
 import 'package:iot_project/widgets/sensor_widget.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -32,6 +33,10 @@ class _HomeScreenState extends State<HomeScreen> {
       username = response["auth"][currentUser!.uid]["username"];
       isConnected = response["auth"][currentUser!.uid]["isConnected"];
     });
+    if(mounted){
+      Provider.of<SmartMeterData>(context,listen:false).updateSmartMeterData();
+    }
+
   }
 
   @override
@@ -42,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
         elevation: 0.0,
         actions: [
           PopupMenuButton<int>(
-              icon: Icon(
+              icon: const Icon(
                 Icons.more_vert_outlined,
                 color: Colors.black,
               ),
@@ -50,11 +55,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     const PopupMenuItem<int>(
                         value: 1, child: Text('All Sensors')),
                     const PopupMenuItem<int>(
-                        value: 2, child: Text('Notifications')),
+                        value: 2, child: Text('Smart Meter')),
                   ],
               onSelected: (int value) {
                 if(value==2){
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => NotificationScreen()));
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const SmartMeterScreen()));
                 }
               }),
         ],
@@ -63,16 +68,14 @@ class _HomeScreenState extends State<HomeScreen> {
         future: readData(),
         builder: (context, snapshot) => snapshot.connectionState ==
                 ConnectionState.waiting
-            ? Center(
+            ? const Center(
                 child: CircularProgressIndicator(
-                  color: Color(0xFF7A5CE0),
+                  color: Color(0xFF125B50),
                 ),
               )
             : SafeArea(
                 child: Container(
-                  width: 100.w,
-                  height: 100.h,
-                  margin: EdgeInsets.symmetric(horizontal: 5.w, vertical: 2.h),
+                  margin: EdgeInsets.symmetric(horizontal: 5.w),
                   child: isConnected
                       ? ListView(
                           children: [
@@ -82,21 +85,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                   fontWeight: FontWeight.w500, fontSize: 6.w),
                             ),
                             SizedBox(
-                              height: 4.h,
+                              height: 2.h,
                             ),
                             Text(
                               "Let's control your trackers",
                               style: TextStyle(
                                   fontWeight: FontWeight.w300,
                                   fontSize: 4.w,
-                                  color: Color(0xFF7A5CE0)),
+                                  color: const Color(0xFF125B50)),
                             ),
                             SizedBox(
                               height: 4.h,
                             ),
                             Image.asset(
-                              "assets/homeScreen.jpg",
-                              height: 35.h,
+                              "assets/iot.jpg",
+                              height: 46.h,
                               width: 80.w,
                             ),
                             SizedBox(
@@ -117,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             SensorWidget(
                               title: "NodeBlue",
-                              categoryName: "Weather Monitor",
+                              categoryName: "Param Monitor",
                               onPressed: () {
                                 Navigator.push(
                                     context,
@@ -128,30 +131,24 @@ class _HomeScreenState extends State<HomeScreen> {
                                             )));
                               },
                             ),
-                            SensorWidget(
-                              title: "FireStixx",
-                              categoryName: "Fire Alarm",
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const FireDetailScreen(
-                                              sensorName: "FireStixx",
-                                            )));
-                              },
-                            ),
                           ],
                         )
-                      : Center(
-                          child: Text(
-                            "Please Pair a Device first by clicking the + button",
-                            style: TextStyle(
-                                color: Colors.black,
-                                fontSize: 5.w,
-                                fontWeight: FontWeight.w400),
+                      : Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Expanded(child: Image.asset("assets/qr_empty.png")),
+                          Expanded(
+                            child: Text(
+                              "Please Pair a Device first by clicking the + button",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 5.w,
+                                  fontWeight: FontWeight.w400),
+                            ),
                           ),
-                        ),
+                        ],
+                      ),
                 ),
               ),
       ),
@@ -160,11 +157,11 @@ class _HomeScreenState extends State<HomeScreen> {
             future: readData(),
             builder: (context,snapshot) =>
                 isConnected
-              ? SizedBox()
+              ? const SizedBox()
                 : FloatingActionButton(
         onPressed: () {
             Navigator.push(
-                context, MaterialPageRoute(builder: (context) => QrCodeView()));
+                context, MaterialPageRoute(builder: (context) => const QrCodeView()));
             setState(() {});
         },
         child: const Icon(

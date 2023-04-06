@@ -21,21 +21,20 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
   final TextEditingController _minController = TextEditingController();
   final TextEditingController _maxController = TextEditingController();
 
-  Future<void> readWeatherMonitorStatus() async {
+  Future<void> setStatus() async{
     await FirebaseDatabase.instance.ref().once().then((event) async {
       final response = event.snapshot.value as Map;
-      if (!mounted) {
-        setState(() {
-          weatherMonitorStatus =
-              response["System"]["Config"]["System1"]["Activate"]["isWeather"];
-        });
-      }
-      print(weatherMonitorStatus);
+        weatherMonitorStatus =
+        response["System"]["Config"]["System1"]["Activate"]["isWeather"];
+
+    });
+  }
+
+  Future<void> readWeatherMonitorStatus() async {
       await Provider.of<WeatherDataProvider>(context, listen: false)
           .fetchWeatherData();
       await Provider.of<WeatherDataProvider>(context, listen: false)
           .setMaxData();
-    });
   }
 
   void dispose() {
@@ -56,8 +55,7 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Text(
-                      "Set Min and Max Values for the $type, All are in Standard Values. \n"
-                      "(Temperature : °C, Humidity : %, Pressure : Pa",
+                      "Set Min and Max Values for the $type, for ${type == "Temperature" ? "°C" : "%"} only.",
                       textAlign: TextAlign.center,
                       style:
                           TextStyle(fontSize: 4.w, fontWeight: FontWeight.w300),
@@ -65,29 +63,31 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
                     TextField(
                       controller: _minController,
                       style: TextStyle(fontSize: 4.w),
-                      cursorColor: const Color(0xFF7A5CE0),
+                      cursorColor: const Color(0xFF125B50),
+                      keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         hintText: "Set Minimum Value",
                         hintStyle: TextStyle(
                             fontWeight: FontWeight.w300, fontSize: 3.w),
                         enabledBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF7A5CE0))),
+                            borderSide: BorderSide(color: Color(0xFF125B50))),
                         focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF7A5CE0))),
+                            borderSide: BorderSide(color: Color(0xFF125B50))),
                       ),
                     ),
                     TextField(
                       controller: _maxController,
                       style: TextStyle(fontSize: 4.w),
-                      cursorColor: const Color(0xFF7A5CE0),
+                      cursorColor: const Color(0xFF125B50),
+                      keyboardType: TextInputType.number,
                       decoration: InputDecoration(
                         hintText: "Set Maximum Value",
                         hintStyle: TextStyle(
                             fontWeight: FontWeight.w300, fontSize: 3.w),
                         enabledBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF7A5CE0))),
+                            borderSide: BorderSide(color: Color(0xFF125B50))),
                         focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(color: Color(0xFF7A5CE0))),
+                            borderSide: BorderSide(color: Color(0xFF125B50))),
                       ),
                     ),
                     SizedBox(
@@ -136,20 +136,6 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
                             "minval": double.parse(_minController.text).floor(),
                           });
                           setState(() {});
-                        } else if (type == "Pressure") {
-                          FirebaseDatabase.instance
-                              .ref()
-                              .child("System")
-                              .child("Config")
-                              .child("System1")
-                              .child("Activate")
-                              .child("ranges")
-                              .child("p")
-                              .update({
-                            "maxval": double.parse(_maxController.text).floor(),
-                            "minval": double.parse(_minController.text).floor(),
-                          });
-                          setState(() {});
                         }
                         _maxController.clear();
                         _minController.clear();
@@ -159,7 +145,7 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
                         padding: EdgeInsets.symmetric(
                             horizontal: 3.w, vertical: 2.h),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF7A5CE0),
+                          color: const Color(0xFF125B50),
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                         child: Text(
@@ -194,28 +180,34 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
           ),
         ),
         title: Text(
-          "Weather Monitor Statistics",
+          "Parameter Statistics",
           style: TextStyle(
               fontWeight: FontWeight.w300, fontSize: 4.w, color: Colors.black),
         ),
         actions: [
-          Switch(
-            value: weatherMonitorStatus,
-            onChanged: (value) async{
-              await FirebaseDatabase.instance
-                  .ref()
-                  .child("System")
-                  .child("Config")
-                  .child("System1")
-                  .child("Activate")
-                  .update({
-                "isWeather": value,
-              });
-              setState(() {
-                weatherMonitorStatus = value;
-              });
-            },
-            activeColor: const Color(0xFFffdf00),
+          FutureBuilder(
+            future: setStatus(),
+            builder: (context,snapshot) {
+              return Switch(
+                value: weatherMonitorStatus,
+                onChanged: (value) async{
+                  await FirebaseDatabase.instance
+                      .ref()
+                      .child("System")
+                      .child("Config")
+                      .child("System1")
+                      .child("Activate")
+                      .update({
+                    "isWeather": value,
+                  }).then((val){
+                    setState((){
+                      weatherMonitorStatus = value;
+                    });
+                  });
+                },
+                activeColor: const Color(0xFFffdf00),
+              );
+            }
           )
         ],
       ),
@@ -225,14 +217,14 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(
                   child: CircularProgressIndicator(
-                color: Color(0xFF7A5CE0),
+                color: Color(0xFF125B50),
               ));
             }
             return SafeArea(
               child: Consumer<WeatherDataProvider>(
                   child: const Center(
                       child: CircularProgressIndicator(
-                    color: Color(0xFF7A5CE0),
+                    color: Color(0xFF125B50),
                   )),
                   builder: (context, weather, child) {
                     if (weather.weather == null) {
@@ -258,7 +250,7 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
                             style: TextStyle(
                                 fontWeight: FontWeight.w300,
                                 fontSize: 4.w,
-                                color: const Color(0xFF7A5CE0)),
+                                color: const Color(0xFF125B50)),
                           ),
                           SizedBox(
                             height: 2.h,
@@ -292,7 +284,7 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
                                       child: Text(
                                         "Set Alert",
                                         style: TextStyle(
-                                            color: const Color(0xFF7A5CE0),
+                                            color: const Color(0xFF125B50),
                                             fontSize: 4.w,
                                             fontWeight: FontWeight.w300),
                                       ))
@@ -355,7 +347,7 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
                                     child: Text(
                                       "Set Alert",
                                       style: TextStyle(
-                                          color: const Color(0xFF7A5CE0),
+                                          color: const Color(0xFF125B50),
                                           fontSize: 4.w,
                                           fontWeight: FontWeight.w300),
                                     ),
@@ -388,74 +380,7 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
                             ],
                           ),
                           SizedBox(
-                            height: 3.h,
-                          ),
-                          SizedBox(
-                            height: 2.h,
-                          ),
-                          CircularPercentIndicator(
-                            radius: 50.0,
-                            lineWidth: 5.0,
-                            animation: true,
-                            percent: weather.weather!.pressurePercent,
-                            center: Text(
-                              "${weather.weather!.pressure.ceil()} Pa",
-                              style: TextStyle(
-                                  fontWeight: FontWeight.w300, fontSize: 5.w),
-                            ),
-                            header: Padding(
-                              padding: EdgeInsets.symmetric(vertical: 2.h),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text(
-                                    "Pressure",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 5.w),
-                                  ),
-                                  GestureDetector(
-                                    onTap: (){
-                                      showModelAlertDialog("Pressure");
-                                    },
-                                    child: Text(
-                                      "Set Alert",
-                                      style: TextStyle(
-                                          color: const Color(0xFF7A5CE0),
-                                          fontSize: 4.w,
-                                          fontWeight: FontWeight.w300),
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ),
-                            circularStrokeCap: CircularStrokeCap.round,
-                            arcType: ArcType.FULL,
-                            arcBackgroundColor: Colors.grey.withOpacity(0.25),
-                            linearGradient: const LinearGradient(colors: [
-                              Color(0xFFC7F2A4),
-                              Color(0xFFB6E388),
-                              Color(0xFF367E18),
-                            ]),
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(
-                                "Min : ${weather.pressureMin} Pa",
-                                style: TextStyle(
-                                    fontSize: 4.w, fontWeight: FontWeight.w300),
-                              ),
-                              Text(
-                                "Max : ${weather.pressureMax} Pa",
-                                style: TextStyle(
-                                    fontSize: 4.w, fontWeight: FontWeight.w300),
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 2.h,
+                            height: 4.h,
                           ),
                         ],
                       ),
@@ -467,31 +392,3 @@ class _WeatherDetailScreenState extends State<WeatherDetailScreen> {
   }
 }
 
-// SizedBox(
-//   height: 8.h,
-//   child: FlutterSlider(
-//     min: 0,
-//     max: 2500.0,
-//     trackBar: FlutterSliderTrackBar(
-//       activeTrackBar: BoxDecoration(
-//         color: Color(0xFF2357FE).withOpacity(0.5)
-//       )
-//     ),
-//     rangeSlider: true,
-//     handlerAnimation: const FlutterSliderHandlerAnimation(
-//         curve: Curves.easeIn,
-//         reverseCurve: Curves.easeInOut,
-//         duration: Duration(milliseconds: 500),
-//         scale: 1.5),
-//     values: [
-//       0.0,
-//       900.0
-//     ],
-//     handler: FlutterSliderHandler(
-//       child: const Icon(Icons.chevron_right, color: Colors.black45, size: 18,),
-//     ),
-//     rightHandler: FlutterSliderHandler(
-//       child: const Icon(Icons.chevron_left, color: Colors.black45, size: 18,),
-//     ),
-//   ),
-// ),

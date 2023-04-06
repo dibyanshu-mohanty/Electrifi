@@ -61,6 +61,9 @@ class _QrCodeViewState extends State<QrCodeView> {
         readPersonalData(scanData.code!);
         controller.stopCamera();
         Navigator.pop(context);
+        setState(() {
+
+        });
       }
     });
   }

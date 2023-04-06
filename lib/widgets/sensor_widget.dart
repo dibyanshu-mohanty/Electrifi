@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:iot_project/screens/automation_detail_screen.dart';
-import 'package:iot_project/screens/fire_detail_screen.dart';
-import 'package:iot_project/screens/weather_details_screen.dart';
 import 'package:sizer/sizer.dart';
 
 
@@ -21,7 +18,7 @@ class SensorWidget extends StatelessWidget {
             elevation: 2.0,
             margin: EdgeInsets.symmetric(horizontal: 2.w,vertical: 2.h),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-            color: Color(0xFF7A5CE0),
+            color: Color(0xFF125B50),
             child: ListTile(
               contentPadding: EdgeInsets.symmetric(vertical: 0.5.h,horizontal: 3.w),
               minLeadingWidth: 1.w,

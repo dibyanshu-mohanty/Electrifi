@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 
-const themeViolet = Color(0xFF7A5CE0);
+const themeViolet = Color(0xFF125B50);
 
 final kInputDecoration = InputDecoration(
   labelText: "Username",

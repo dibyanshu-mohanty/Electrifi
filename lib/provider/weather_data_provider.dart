@@ -1,30 +1,11 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
-
-class WeatherData {
-  final double tempPercent;
-  final double temperature;
-  final double humidityPercent;
-  final double humidity;
-  final double pressurePercent;
-  final double pressure;
-  final int epoch;
-
-  WeatherData({
-    required this.temperature,
-    required this.tempPercent,
-    required this.humidity,
-    required this.humidityPercent,
-    required this.pressure,
-    required this.pressurePercent,
-    required this.epoch,
-  });
-}
+import 'package:iot_project/models/weather_model.dart';
 
 class WeatherDataProvider with ChangeNotifier {
-  WeatherData? _weather;
+  Weather? _weather;
 
-  WeatherData? get weather {
+  Weather? get weather {
     return _weather;
   }
 
@@ -34,8 +15,6 @@ class WeatherDataProvider with ChangeNotifier {
   int _humidMax = 100;
   int _humidMin = 0;
 
-  int _pressureMax = 1000;
-  int _pressureMin = 0;
 
   int get tempMax{
     return _tempMax;
@@ -49,49 +28,47 @@ class WeatherDataProvider with ChangeNotifier {
   int get humidMin{
     return _humidMin;
   }
-  int get pressureMax{
-    return _pressureMax;
-  }
-  int get pressureMin{
-    return _pressureMin;
-  }
 
 
 
   double calculateTempPercent(double input) {
-    return double.parse((input / 500).toStringAsFixed(1));
+    return double.parse((input / 100).toStringAsFixed(1));
   }
 
   double calculateHumidityPercent(double input) {
     return double.parse((input / 100).toStringAsFixed(1));
   }
 
-  double calculatePressurePercent(double input) {
-    return double.parse((input / 1000).toStringAsFixed(1));
-  }
 
+  Map<dynamic,dynamic> getLatest(List arr) {
+      int max = 0;
+      for(int i =0; i< arr.length; i++){
+        if(arr[i]["epochtime"] > max){
+          max = arr[i]["epochtime"];
+        } else {
+          continue ;
+        }
+      }
+      return arr.firstWhere((element) => element["epochtime"] == max);
+  }
   Future<void> fetchWeatherData() async {
-    await FirebaseDatabase.instance.ref().once().then((event) {
+    await FirebaseDatabase.instance.ref().once().then((event) async{
       final response = event.snapshot.value as Map;
       Map tempo = response["System"]["Config"]["System1"]["Weather"];
-      final data = tempo[tempo.keys.toList().last];
+      final data = getLatest(tempo.values.toList());
+      print(data);
       double temperature = data["temprature"];
       final tempPercent =
           calculateTempPercent(data["temprature"]);
       double humidity = data["humidity"];
       final humidityPercent =
           calculateHumidityPercent(data["humidity"]);
-      double pressure =data["pressure"];
-      final pressurePercent =
-          calculatePressurePercent(data["pressure"]);
       final epoch = data["epochtime"];
-      _weather = WeatherData(
+      _weather = Weather(
           temperature: temperature,
           tempPercent: tempPercent,
           humidity: humidity,
           humidityPercent: humidityPercent,
-          pressure: pressure,
-          pressurePercent: pressurePercent,
           epoch: epoch,
       );
       notifyListeners();
@@ -112,9 +89,6 @@ class WeatherDataProvider with ChangeNotifier {
 
       _humidMin = humidData["minval"];
       _humidMax = humidData["maxval"];
-
-      _pressureMin = pressureData["minval"];
-      _pressureMax = pressureData["maxval"];
       notifyListeners();
     }).catchError((error) {
       print(error);

@@ -98,7 +98,7 @@ class _AutomationDetailScreenState extends State<AutomationDetailScreen> {
                     style: TextStyle(
                         fontWeight: FontWeight.w300,
                         fontSize: 4.w,
-                        color: const Color(0xFF7A5CE0)),
+                        color: const Color(0xFF125B50)),
                   ),
                   SizedBox(
                     height: 2.h,

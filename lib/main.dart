@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:iot_project/provider/smart_meter_provider.dart';
 import 'package:iot_project/provider/weather_data_provider.dart';
 import 'package:iot_project/screens/auth_screen.dart';
 import 'package:iot_project/screens/home_screen.dart';
@@ -24,14 +25,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => WeatherDataProvider())
+        ChangeNotifierProvider(create: (context) => WeatherDataProvider()),
+        ChangeNotifierProvider(create: (context) => SmartMeterData()),
       ],
       child: Sizer(
         builder:(context,orientation,deviceType) => MaterialApp(
           title: 'IoT Project',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            scaffoldBackgroundColor: Colors.white
+            scaffoldBackgroundColor: Colors.white,
+            fontFamily: "Satoshi"
           ),
           home: SplashScreen(),
         ),
